@@ -7,7 +7,7 @@ export class CreateUserDto {
   @IsString({ message: 'نام خانوادگی کاربر را وارد کنید' })
   lastName: string;
 
-  @IsString({ message: 'شاره موبایل کاربر را وارد کنید' })
+  @IsString({ message: 'شماره موبایل کاربر را وارد کنید' })
   phoneNumber: string;
 
   @IsString({ message: 'نام کاربری کاربر را وارد کنید' })

@@ -15,21 +15,33 @@ import { ChangeUserPasswordDto } from './dto/change-user-password.dto';
 @Controller('users')
 export class UsersController {
   constructor(readonly userService: UsersService) {}
-  @Get()
-  getUsers() {}
+  @Get('')
+  getUsers() {
+    return this.userService.getUsers();
+  }
 
-  @Get(':id')
-  getUser(@Param('id') id: string) {}
+  // @Get(':id')
+  // getUser(@Param('id') id: string) {
+  //   return this.userService.
+  // }
 
   @Post('/create')
-  createUser(@Body() createUserDto: CreateUserDto) {}
+  createUser(@Body() createUserDto: CreateUserDto) {
+    return this.userService.createUser(createUserDto);
+  }
 
   @Patch('/update')
-  updateUser(@Body() updateUserDto: UpdateUserDto) {}
+  updateUser(@Body() updateUserDto: UpdateUserDto) {
+    return this.userService.updateUser(updateUserDto);
+  }
 
   @Patch('/changePassword')
-  changePassword(@Body() changeUserPasswordDto: ChangeUserPasswordDto) {}
+  changePassword(@Body() changeUserPasswordDto: ChangeUserPasswordDto) {
+    return this.userService.changeUserPassword(changeUserPasswordDto);
+  }
 
   @Delete('/:id/delete')
-  deleteUser(@Param('id') id: string) {}
+  deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id);
+  }
 }
