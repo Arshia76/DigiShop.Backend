@@ -4,8 +4,7 @@ import { Product } from './product.schema';
 import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-
-import { deleteFile } from '@/shared/utils/deleteFile';
+import { deleteFile } from '@/shared/utils';
 
 @Injectable()
 export class ProductsService {
