@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
+import { deleteFile } from '@/shared/utils/deleteFile';
+
 @Injectable()
 export class ProductsService {
   constructor(
@@ -12,7 +14,7 @@ export class ProductsService {
   ) {}
 
   async getProducts() {
-    return this.productModel.find();
+    return this.productModel.find().populate('category').lean();
   }
 
   async getProduct(id: string) {
@@ -24,17 +26,35 @@ export class ProductsService {
     return product;
   }
 
-  async createProduct(createProductDto: CreateProductDto) {
-    return this.productModel.create(createProductDto);
+  async createProduct(
+    createProductDto: CreateProductDto,
+    productImage: Express.Multer.File,
+  ) {
+    return this.productModel.create({
+      ...createProductDto,
+      image: productImage.path,
+    });
   }
 
-  async updateProduct(updateProductDto: UpdateProductDto) {
+  async updateProduct(
+    updateProductDto: UpdateProductDto,
+    productImage: Express.Multer.File,
+  ) {
     const { id } = updateProductDto;
 
     const product = await this.productModel.findById(id);
 
     if (!product) {
       throw new NotFoundException('محصولی با این مشخصات یافت نشد');
+    }
+
+    if (productImage) {
+      if (product.image) deleteFile('./' + product.image);
+
+      return this.productModel.findByIdAndUpdate(id, {
+        ...updateProductDto,
+        image: productImage.path,
+      });
     }
 
     return this.productModel.findByIdAndUpdate(id, updateProductDto);

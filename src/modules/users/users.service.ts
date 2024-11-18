@@ -1,8 +1,10 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
@@ -18,19 +20,65 @@ export class UsersService {
     return this.userModel.find();
   }
 
-  async createUser(createUserDto: CreateUserDto) {
-    return this.userModel.create(createUserDto);
+  async find({
+    username,
+    phoneNumber,
+  }: {
+    username?: string;
+    phoneNumber?: string;
+  }) {
+    const user = this.userModel.findOne({
+      $or: [{ username }, { phoneNumber }],
+    });
+    if (!user) return null;
+    return user;
   }
 
-  async updateUser(updateUserDto: UpdateUserDto) {
-    const { id } = updateUserDto;
+  async getUser(id: string) {
     const user = await this.userModel.findById(id);
 
     if (!user) {
       throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
     }
 
-    return this.userModel.findByIdAndUpdate(updateUserDto);
+    return user;
+  }
+
+  async createUser(createUserDto: CreateUserDto) {
+    const { phoneNumber, username, password } = createUserDto;
+    const user = await this.find({ phoneNumber, username });
+
+    if (user) {
+      throw new BadRequestException('کاربری با این مشخصات ثبت شده است');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    return this.userModel.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+  }
+
+  async updateUser(updateUserDto: UpdateUserDto) {
+    console.log(updateUserDto);
+
+    const { id, phoneNumber, username } = updateUserDto;
+
+    const user = await this.userModel.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
+    }
+
+    const duplicateUser = await this.find({ username, phoneNumber });
+
+    if (duplicateUser) {
+      throw new BadRequestException('کاربری با این مشخصات ثبت شده است');
+    }
+
+    return this.userModel.findByIdAndUpdate(id, updateUserDto);
   }
 
   async changeUserPassword(changeUserPasswordDto: ChangeUserPasswordDto) {
@@ -41,11 +89,15 @@ export class UsersService {
       throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
     }
 
-    if (user.toJSON().password !== oldPassword) {
-      throw new BadRequestException('رمز عبور قبلی وارد شده مطابقت ندارد ');
+    const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isPasswordMatch) {
+      throw new ForbiddenException('رمز ورودی اشتباه است');
     }
 
-    user.toJSON().password = newPassword;
+    const salt = await bcrypt.genSalt();
+
+    user.password = await bcrypt.hash(newPassword, salt);
 
     return user.save();
   }
