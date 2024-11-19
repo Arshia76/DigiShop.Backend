@@ -43,6 +43,7 @@ export class AuthService {
         expiresIn: '1d',
       }),
       id: user.id,
+      role: user.role,
     };
 
     return data;
@@ -73,6 +74,7 @@ export class AuthService {
         expiresIn: '1d',
       }),
       id: user.id,
+      role: user.role,
     };
     return data;
   }
