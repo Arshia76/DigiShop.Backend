@@ -40,7 +40,7 @@ export class CategoriesService {
 
     const duplicateCategory = await this.categoryModel.findOne({ title });
 
-    if (category) {
+    if (duplicateCategory) {
       throw new BadRequestException('دسته بندی موجود می باشد');
     }
 
@@ -54,6 +54,6 @@ export class CategoriesService {
       throw new NotFoundException('دسته بندی با این مشخصات یافت نشد');
     }
 
-    return this.categoryModel.findByIdAndDelete(id);
+    return this.categoryModel.findOneAndDelete({ _id: id });
   }
 }

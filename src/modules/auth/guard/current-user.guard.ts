@@ -11,17 +11,18 @@ export class CurrentUserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const { user, params, body } = context.switchToHttp().getRequest();
 
+    const isAdmin = user.role === Role.ADMIN;
+
+    if (isAdmin) {
+      return true;
+    }
+
     const curentUserId = params?.id || body?.id;
 
     if (!curentUserId) {
       throw new BadRequestException('شناسه کاربر را وارد کنید');
     }
 
-    const isAdmin = user.role === Role.ADMIN;
-
-    if (isAdmin) {
-      return true;
-    }
     return user.id === curentUserId;
   }
 }

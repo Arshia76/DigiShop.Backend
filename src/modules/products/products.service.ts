@@ -66,6 +66,8 @@ export class ProductsService {
       throw new NotFoundException('محصولی با این مشخصات یافت نشد');
     }
 
+    if (product.image) deleteFile('./' + product.image);
+
     return this.productModel.findByIdAndDelete(id);
   }
 }

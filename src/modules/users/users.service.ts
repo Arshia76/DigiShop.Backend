@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,10 +12,14 @@ import { User } from './user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangeUserPasswordDto } from './dto/change-user-password.dto';
+import { REQUEST } from '@nestjs/core';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    @Inject(REQUEST) private readonly request: Request,
+  ) {}
 
   async getUsers() {
     return this.userModel.find();
@@ -27,10 +32,12 @@ export class UsersService {
     username?: string;
     phoneNumber?: string;
   }) {
-    const user = this.userModel.findOne({
+    const user = await this.userModel.findOne({
       $or: [{ username }, { phoneNumber }],
     });
-    if (!user) return null;
+
+    // @ts-ignore
+    if (!user || this.request?.body.id === user._id.toString()) return null;
     return user;
   }
 
@@ -62,8 +69,6 @@ export class UsersService {
   }
 
   async updateUser(updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-
     const { id, phoneNumber, username } = updateUserDto;
 
     const user = await this.userModel.findById(id);
