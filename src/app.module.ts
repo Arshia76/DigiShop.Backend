@@ -7,6 +7,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     CategoriesModule,
     UsersModule,
     AuthModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],

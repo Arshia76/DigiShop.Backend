@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { Role } from 'src/shared/enum';
+import { OrderSchema } from '../orders/order.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -26,3 +27,18 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.pre('findOneAndDelete', async function (next) {
+  try {
+    const userID = this.getQuery()._id;
+    const orderModel = this.model.db.model('Order', OrderSchema);
+
+    await orderModel.deleteMany({
+      category: new mongoose.Types.ObjectId(userID),
+    });
+    next();
+  } catch (error) {
+    console.error('خطا در حذف سفارش', error);
+    next();
+  }
+});

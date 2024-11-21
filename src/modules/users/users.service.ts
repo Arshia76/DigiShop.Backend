@@ -22,7 +22,7 @@ export class UsersService {
   ) {}
 
   async getUsers() {
-    return this.userModel.find();
+    return this.userModel.find().lean();
   }
 
   async find({
@@ -114,6 +114,6 @@ export class UsersService {
       throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
     }
 
-    return this.userModel.findByIdAndDelete(id);
+    return this.userModel.findOneAndDelete({ _id: id });
   }
 }

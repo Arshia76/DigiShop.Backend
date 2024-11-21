@@ -16,7 +16,7 @@ export class CategoriesService {
   ) {}
 
   async getCategories() {
-    return this.categoryModel.find();
+    return this.categoryModel.find().lean();
   }
 
   async createCategory(createCategoryDto: CreateCategoryDto) {
