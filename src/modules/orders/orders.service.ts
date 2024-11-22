@@ -17,12 +17,18 @@ export class OrdersService {
 
   async getCurrentUserOrders() {
     // @ts-ignore
-    const userId = this.request?.user._id;
+    const userId = this.request?.user.id;
 
     return this.orderModel.find({ user: userId }).populate('user').lean();
   }
 
   async createOrder(createOrderDto: CreateOrderDto) {
-    return this.orderModel.create(createOrderDto);
+    const data = {
+      ...createOrderDto,
+      totalAmount: Number(createOrderDto.totalAmount),
+      date: createOrderDto.date,
+      user: createOrderDto.userId,
+    };
+    return this.orderModel.create(data);
   }
 }
