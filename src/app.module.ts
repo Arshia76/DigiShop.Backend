@@ -11,7 +11,9 @@ import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/DigiShop'),
+    MongooseModule.forRoot('mongodb://localhost/DigiShop', {
+      ignoreUndefined: true,
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '/uploads'),

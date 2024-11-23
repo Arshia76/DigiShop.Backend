@@ -17,6 +17,6 @@ export class CreateProductDto {
   @IsString({ message: 'دسته بندی محصول را مشخص کنید' })
   category: Category;
 
-  // @IsString({ message: 'تصویر محصول را مشخص کنید' })
-  // image: string;
+  @IsString({ message: 'تاریخ ایجاد محصول را مشخص کنید' })
+  date: string;
 }

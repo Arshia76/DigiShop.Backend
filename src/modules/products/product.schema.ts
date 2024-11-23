@@ -21,6 +21,9 @@ export class Product {
   @Prop()
   image: string;
 
+  @Prop()
+  date: Date;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category' })
   category: Category;
 }

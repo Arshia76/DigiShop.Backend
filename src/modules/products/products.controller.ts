@@ -12,6 +12,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -24,14 +25,15 @@ import { AccessJwtAuthGuard } from '../auth/guard/jwt-access-auth.guard';
 import { Roles } from '@/shared/decorators/roles.decorator';
 import { Role } from '@/shared/enum';
 import { RolesGuard } from '../auth/guard/roles.guard';
+import { ProductQueryDto } from './dto/product-query.dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(readonly productService: ProductsService) {}
 
   @Get()
-  getProducts() {
-    return this.productService.getProducts();
+  getProducts(@Query() productQueryDto: ProductQueryDto) {
+    return this.productService.getProducts(productQueryDto);
   }
 
   @Get(':id')

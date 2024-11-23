@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { deleteFile } from '@/shared/utils';
+import { ProductQueryDto } from './dto/product-query.dto';
 
 @Injectable()
 export class ProductsService {
@@ -12,12 +13,17 @@ export class ProductsService {
     @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
 
-  async getProducts() {
-    return this.productModel.find().populate('category').lean();
+  async getProducts(productQueryDto: ProductQueryDto) {
+    const { category, query, sort } = productQueryDto;
+    return this.productModel
+      .find({ category: category, title: query })
+      .populate('category')
+      .sort({ [sort]: 'desc' })
+      .lean();
   }
 
   async getProduct(id: string) {
-    const product = await this.productModel.findById(id);
+    const product = await this.productModel.findById(id).populate('category');
 
     if (!product) {
       throw new NotFoundException('محصولی با این مشخصات یافت نشد');

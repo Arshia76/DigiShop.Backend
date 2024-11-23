@@ -22,7 +22,7 @@ export class UsersService {
   ) {}
 
   async getUsers() {
-    return this.userModel.find().lean();
+    return this.userModel.find({}, { password: 0 }).lean();
   }
 
   async find({
@@ -42,7 +42,7 @@ export class UsersService {
   }
 
   async getUser(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id, { password: 0 });
 
     if (!user) {
       throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
@@ -62,10 +62,13 @@ export class UsersService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    return this.userModel.create({
+    const createdUser = await this.userModel.create({
       ...createUserDto,
       password: hashedPassword,
     });
+
+    const { password: userPassword, ...data } = createdUser;
+    return data;
   }
 
   async updateUser(updateUserDto: UpdateUserDto) {
@@ -83,7 +86,9 @@ export class UsersService {
       throw new BadRequestException('کاربری با این مشخصات ثبت شده است');
     }
 
-    return this.userModel.findByIdAndUpdate(id, updateUserDto);
+    return this.userModel.findByIdAndUpdate(id, updateUserDto, {
+      projection: { password: 0 },
+    });
   }
 
   async changeUserPassword(changeUserPasswordDto: ChangeUserPasswordDto) {
@@ -114,6 +119,9 @@ export class UsersService {
       throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
     }
 
-    return this.userModel.findOneAndDelete({ _id: id });
+    return this.userModel.findOneAndDelete(
+      { _id: id },
+      { projection: { password: 0 } },
+    );
   }
 }
