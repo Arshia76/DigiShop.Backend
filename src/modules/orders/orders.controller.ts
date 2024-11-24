@@ -6,7 +6,9 @@ import { RolesGuard } from '../auth/guard/roles.guard';
 import { Roles } from '@/shared/decorators/roles.decorator';
 import { Role } from '@/shared/enum';
 import { CurrentUserGuard } from '../auth/guard/current-user.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}

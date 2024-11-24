@@ -19,6 +19,10 @@ export class CategoriesService {
     return this.categoryModel.find().lean();
   }
 
+  async findCategoryById(id: string) {
+    return this.categoryModel.findById(id).lean();
+  }
+
   async createCategory(createCategoryDto: CreateCategoryDto) {
     const { title } = createCategoryDto;
     const category = await this.categoryModel.findOne({ title });

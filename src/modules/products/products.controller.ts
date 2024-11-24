@@ -26,6 +26,7 @@ import { Roles } from '@/shared/decorators/roles.decorator';
 import { Role } from '@/shared/enum';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { ProductQueryDto } from './dto/product-query.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('products')
 export class ProductsController {
@@ -41,6 +42,7 @@ export class ProductsController {
     return this.productService.getProduct(id);
   }
 
+  @ApiBearerAuth()
   @Post('/create')
   @UseGuards(AccessJwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -71,6 +73,7 @@ export class ProductsController {
     return this.productService.createProduct(createProductDto, productImage);
   }
 
+  @ApiBearerAuth()
   @Patch('/update')
   @UseGuards(AccessJwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -102,6 +105,7 @@ export class ProductsController {
     return this.productService.updateProduct(updateProductDto, productImage);
   }
 
+  @ApiBearerAuth()
   @Delete('/:id/delete')
   @UseGuards(AccessJwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)

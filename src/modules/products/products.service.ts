@@ -6,11 +6,13 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { deleteFile } from '@/shared/utils';
 import { ProductQueryDto } from './dto/product-query.dto';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async getProducts(productQueryDto: ProductQueryDto) {
@@ -35,6 +37,14 @@ export class ProductsService {
     createProductDto: CreateProductDto,
     productImage: Express.Multer.File,
   ) {
+    const category = await this.categoriesService.findCategoryById(
+      createProductDto.category,
+    );
+
+    if (!category) {
+      throw new NotFoundException('دسته بندی موجود نمی باشد');
+    }
+
     return this.productModel.create({
       ...createProductDto,
       image: productImage.path,
@@ -51,6 +61,14 @@ export class ProductsService {
 
     if (!product) {
       throw new NotFoundException('محصولی با این مشخصات یافت نشد');
+    }
+
+    const category = await this.categoriesService.findCategoryById(
+      updateProductDto.category,
+    );
+
+    if (!category) {
+      throw new NotFoundException('دسته بندی موجود نمی باشد');
     }
 
     if (productImage) {

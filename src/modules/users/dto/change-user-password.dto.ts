@@ -1,23 +1,36 @@
-import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class ChangeUserPasswordDto {
-  @IsString({ message: 'شناسه کاربر را وارد کنید' })
+  @ApiProperty()
+  @IsNotEmpty({ message: 'شناسه کاربر را وارد کنید' })
+  @IsString({ message: 'شناسه کاربر را به صورت رشته وارد کنید' })
   id: string;
 
-  @IsString({ message: 'رمز عبور قبلی کاربر را وارد کنید' })
+  @ApiProperty()
+  @IsNotEmpty({ message: 'رمز عبور قبلی کاربر را وارد کنید' })
+  @IsString({ message: 'رمز عبور قبلی کاربر را به صورت رشته وارد کنید' })
   oldPassword: string;
 
-  @IsString({ message: 'رمز عبور جدید کاربر را وارد کنید' })
+  @ApiProperty()
+  @IsNotEmpty({ message: 'رمز عبور جدید کاربر را وارد کنید' })
+  @IsString({ message: 'رمز عبور جدید کاربر را به صورت رشته وارد کنید' })
   newPassword: string;
 }
 
 export class ChangeUserPasswordByAdminDto {
-  @IsString({ message: 'شناسه کاربر را وارد کنید' })
+  @ApiProperty()
+  @IsNotEmpty({ message: 'شناسه کاربر را وارد کنید' })
+  @IsString({ message: 'شناسه کاربر را به صورت رشته وارد کنید' })
   id: string;
 
-  @IsString({ message: 'رمز عبور قبلی کاربر را وارد کنید' })
+  @ApiProperty()
+  @IsNotEmpty({ message: 'رمز عبور قبلی کاربر را وارد کنید' })
+  @IsString({ message: 'رمز عبور قبلی کاربر را به صورت رشته وارد کنید' })
   newPassword: string;
 
-  @IsString({ message: 'رمز عبور جدید کاربر را وارد کنید' })
+  @ApiProperty()
+  @IsNotEmpty({ message: 'رمز عبور جدید کاربر را وارد کنید' })
+  @IsString({ message: 'رمز عبور جدید کاربر را به صورت رشته وارد کنید' })
   confirmNewPassword: string;
 }

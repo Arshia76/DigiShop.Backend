@@ -20,7 +20,9 @@ import { Roles } from '@/shared/decorators/roles.decorator';
 import { Role } from '@/shared/enum';
 import { CurrentUserGuard } from '../auth/guard/current-user.guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(readonly userService: UsersService) {}
