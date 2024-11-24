@@ -11,8 +11,12 @@ import { Model } from 'mongoose';
 import { User } from './user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ChangeUserPasswordDto } from './dto/change-user-password.dto';
+import {
+  ChangeUserPasswordByAdminDto,
+  ChangeUserPasswordDto,
+} from './dto/change-user-password.dto';
 import { REQUEST } from '@nestjs/core';
+import { Role } from '@/shared/enum';
 
 @Injectable()
 export class UsersService {
@@ -33,7 +37,7 @@ export class UsersService {
     phoneNumber?: string;
   }) {
     const user = await this.userModel.findOne({
-      $or: [{ username }, { phoneNumber }],
+      $or: [{ username: username ?? '' }, { phoneNumber: phoneNumber ?? '' }],
     });
 
     // @ts-ignore
@@ -93,6 +97,7 @@ export class UsersService {
 
   async changeUserPassword(changeUserPasswordDto: ChangeUserPasswordDto) {
     const { id, oldPassword, newPassword } = changeUserPasswordDto;
+
     const user = await this.userModel.findById(id);
 
     if (!user) {
@@ -109,7 +114,37 @@ export class UsersService {
 
     user.password = await bcrypt.hash(newPassword, salt);
 
-    return user.save();
+    const changedUser = (await user.save()).toJSON();
+
+    const { password: changedPassword, ...data } = changedUser;
+
+    return data;
+  }
+
+  async changeUserPasswordByAdmin(
+    changeUserPasswordByAdmin: ChangeUserPasswordByAdminDto,
+  ) {
+    const { id, confirmNewPassword, newPassword } = changeUserPasswordByAdmin;
+
+    const user = await this.userModel.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      throw new ForbiddenException('رمز عبور ها مطابقت ندارند');
+    }
+
+    const salt = await bcrypt.genSalt();
+
+    user.password = await bcrypt.hash(newPassword, salt);
+
+    const changedUser = (await user.save()).toJSON();
+
+    const { password: changedPassword, ...data } = changedUser;
+
+    return data;
   }
 
   async deleteUser(id: string) {

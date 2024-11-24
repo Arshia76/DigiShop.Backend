@@ -11,7 +11,10 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
-import { ChangeUserPasswordDto } from './dto/change-user-password.dto';
+import {
+  ChangeUserPasswordByAdminDto,
+  ChangeUserPasswordDto,
+} from './dto/change-user-password.dto';
 import { AccessJwtAuthGuard } from '../auth/guard/jwt-access-auth.guard';
 import { Roles } from '@/shared/decorators/roles.decorator';
 import { Role } from '@/shared/enum';
@@ -46,10 +49,21 @@ export class UsersController {
     return this.userService.updateUser(updateUserDto);
   }
 
-  @Patch('/changePassword')
+  @Patch('/changeUserPassword')
   @UseGuards(AccessJwtAuthGuard, CurrentUserGuard)
-  changePassword(@Body() changeUserPasswordDto: ChangeUserPasswordDto) {
+  changeUserPassword(@Body() changeUserPasswordDto: ChangeUserPasswordDto) {
     return this.userService.changeUserPassword(changeUserPasswordDto);
+  }
+
+  @Patch('/changeUserPasswordByAdmin')
+  @UseGuards(AccessJwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  changeUserPasswordByAdmin(
+    @Body() changeUserPasswordByAdminDto: ChangeUserPasswordByAdminDto,
+  ) {
+    return this.userService.changeUserPasswordByAdmin(
+      changeUserPasswordByAdminDto,
+    );
   }
 
   @Delete('/:id/delete')
