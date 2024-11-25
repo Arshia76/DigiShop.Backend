@@ -16,10 +16,8 @@ import {
   ChangeUserPasswordDto,
 } from './dto/change-user-password.dto';
 import { AccessJwtAuthGuard } from '../auth/guard/jwt-access-auth.guard';
-import { Roles } from '@/shared/decorators/roles.decorator';
-import { Role } from '@/shared/enum';
 import { CurrentUserGuard } from '../auth/guard/current-user.guard';
-import { RolesGuard } from '../auth/guard/roles.guard';
+import { AdminGuard } from '../auth/guard/admin.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiBearerAuth()
@@ -27,8 +25,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class UsersController {
   constructor(readonly userService: UsersService) {}
   @Get('')
-  @UseGuards(AccessJwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(AccessJwtAuthGuard, AdminGuard)
   getUsers() {
     return this.userService.getUsers();
   }
@@ -58,8 +55,7 @@ export class UsersController {
   }
 
   @Patch('/changeUserPasswordByAdmin')
-  @UseGuards(AccessJwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(AccessJwtAuthGuard, AdminGuard)
   changeUserPasswordByAdmin(
     @Body() changeUserPasswordByAdminDto: ChangeUserPasswordByAdminDto,
   ) {
@@ -69,8 +65,7 @@ export class UsersController {
   }
 
   @Delete('/:id/delete')
-  @UseGuards(AccessJwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(AccessJwtAuthGuard, AdminGuard)
   deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
   }

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumberString, IsString } from 'class-validator';
-import { Category } from 'src/modules/categories/category.schema';
 
 export class CreateProductDto {
   @ApiProperty()
@@ -32,4 +31,7 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'تاریخ ایجاد محصول را مشخص کنید' })
   @IsString({ message: 'تاریخ ایجاد محصول باید به صورت رشته وارد شود' })
   date: string;
+
+  @ApiProperty({ type: 'string', format: 'binary', required: true })
+  image: Express.Multer.File;
 }

@@ -2,9 +2,7 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersService } from './orders.service';
 import { AccessJwtAuthGuard } from '../auth/guard/jwt-access-auth.guard';
-import { RolesGuard } from '../auth/guard/roles.guard';
-import { Roles } from '@/shared/decorators/roles.decorator';
-import { Role } from '@/shared/enum';
+import { AdminGuard } from '../auth/guard/admin.guard';
 import { CurrentUserGuard } from '../auth/guard/current-user.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -14,8 +12,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get('')
-  @UseGuards(AccessJwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(AccessJwtAuthGuard, AdminGuard)
   getOrders() {
     return this.ordersService.getOrders();
   }

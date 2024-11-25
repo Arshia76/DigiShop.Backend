@@ -13,6 +13,7 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -22,11 +23,9 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { Express } from 'express';
 import { AccessJwtAuthGuard } from '../auth/guard/jwt-access-auth.guard';
-import { Roles } from '@/shared/decorators/roles.decorator';
-import { Role } from '@/shared/enum';
-import { RolesGuard } from '../auth/guard/roles.guard';
+import { AdminGuard } from '../auth/guard/admin.guard';
 import { ProductQueryDto } from './dto/product-query.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiProperty } from '@nestjs/swagger';
 
 @Controller('products')
 export class ProductsController {
@@ -43,14 +42,16 @@ export class ProductsController {
   }
 
   @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
   @Post('/create')
-  @UseGuards(AccessJwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(AccessJwtAuthGuard, AdminGuard)
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
         destination: './uploads/products',
         filename(req, file, callback) {
+          if (!file)
+            throw new BadRequestException('تصویر محصول را انتخاب کنید');
           const filename =
             file.originalname + '-' + Date.now() + extname(file.originalname);
           callback(null, filename);
@@ -63,7 +64,10 @@ export class ProductsController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 }),
+          new MaxFileSizeValidator({
+            maxSize: 1024 * 1024,
+            message: 'اندازه عکس باید  کمتر از 1 مگابایت باشد',
+          }),
           new FileTypeValidator({ fileType: '.(jpg|jpeg|png)$' }),
         ],
       }),
@@ -74,9 +78,9 @@ export class ProductsController {
   }
 
   @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
   @Patch('/update')
-  @UseGuards(AccessJwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(AccessJwtAuthGuard, AdminGuard)
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -107,8 +111,7 @@ export class ProductsController {
 
   @ApiBearerAuth()
   @Delete('/:id/delete')
-  @UseGuards(AccessJwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(AccessJwtAuthGuard, AdminGuard)
   deleteProduct(@Param('id') id: string) {
     return this.productService.deleteProduct(id);
   }
