@@ -5,7 +5,7 @@ import { OrderSchema } from '../orders/order.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   @Prop()
   firstName: string;

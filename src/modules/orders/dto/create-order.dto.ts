@@ -34,14 +34,4 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'قیمت کل  را مشخص کنید' })
   @IsString({ message: 'قیمت کل را به صورت رشته مشخص کنید' })
   totalAmount: string;
-
-  @ApiProperty()
-  @IsNotEmpty({ message: 'تاریخ را مشخص کنید' })
-  @IsString({ message: 'تاریخ را به صورت رشته مشخص کنید' })
-  date: string;
-
-  @ApiProperty()
-  @IsNotEmpty({ message: 'شناسه کاربر را مشخص کنید' })
-  @IsString({ message: 'شناسه کاربر را به صورت رشته مشخص کنید' })
-  userId: string;
 }

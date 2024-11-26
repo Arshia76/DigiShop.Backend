@@ -5,7 +5,7 @@ import { deleteFile } from '@/shared/utils';
 
 export type CategoryDocument = HydratedDocument<Category>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Category {
   @Prop()
   title: string;

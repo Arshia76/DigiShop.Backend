@@ -27,11 +27,6 @@ export class CreateProductDto {
   @IsString({ message: 'دسته بندی محصول باید به صورت رشته وارد شود' })
   category: string;
 
-  @ApiProperty()
-  @IsNotEmpty({ message: 'تاریخ ایجاد محصول را مشخص کنید' })
-  @IsString({ message: 'تاریخ ایجاد محصول باید به صورت رشته وارد شود' })
-  date: string;
-
   @ApiProperty({ type: 'string', format: 'binary', required: true })
   image: Express.Multer.File;
 }

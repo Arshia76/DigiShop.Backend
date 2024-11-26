@@ -36,9 +36,11 @@ export class UsersService {
     username?: string;
     phoneNumber?: string;
   }) {
-    const user = await this.userModel.findOne({
-      $or: [{ username: username ?? '' }, { phoneNumber: phoneNumber ?? '' }],
-    });
+    const user = await this.userModel
+      .findOne({
+        $or: [{ username: username ?? '' }, { phoneNumber: phoneNumber ?? '' }],
+      })
+      .lean();
 
     // @ts-ignore
     if (!user || this.request?.body.id === user._id.toString()) return null;
@@ -46,7 +48,7 @@ export class UsersService {
   }
 
   async getUser(id: string) {
-    const user = await this.userModel.findById(id, { password: 0 });
+    const user = await this.userModel.findById(id, { password: 0 }).lean();
 
     if (!user) {
       throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
@@ -71,7 +73,7 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    const { password: userPassword, ...data } = createdUser;
+    const { password: userPassword, ...data } = createdUser.toJSON();
     return data;
   }
 
@@ -90,9 +92,12 @@ export class UsersService {
       throw new BadRequestException('کاربری با این مشخصات ثبت شده است');
     }
 
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, {
-      projection: { password: 0 },
-    });
+    return this.userModel
+      .findByIdAndUpdate(id, updateUserDto, {
+        projection: { password: 0 },
+        new: true,
+      })
+      .lean();
   }
 
   async changeUserPassword(changeUserPasswordDto: ChangeUserPasswordDto) {
@@ -148,15 +153,14 @@ export class UsersService {
   }
 
   async deleteUser(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id).lean();
 
     if (!user) {
       throw new NotFoundException('کاربری با این اطلاعات وجود ندارد');
     }
 
-    return this.userModel.findOneAndDelete(
-      { _id: id },
-      { projection: { password: 0 } },
-    );
+    return this.userModel
+      .findOneAndDelete({ _id: id }, { projection: { password: 0 } })
+      .lean();
   }
 }

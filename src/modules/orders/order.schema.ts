@@ -19,13 +19,10 @@ export class Address {
   detail: string;
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Order {
   @Prop()
   address: Address;
-
-  @Prop()
-  date: Date;
 
   @Prop()
   totalAmount: number;

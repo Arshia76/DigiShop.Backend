@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { join } from 'path';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -11,8 +11,15 @@ import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/DigiShop', {
-      ignoreUndefined: true,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory(configService: ConfigService) {
+        return {
+          uri: configService.get('MONGO_URI'),
+          ignoreUndefined: true,
+        };
+      },
+      inject: [ConfigService],
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRoot({

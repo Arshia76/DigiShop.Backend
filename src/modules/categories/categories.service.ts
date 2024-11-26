@@ -25,30 +25,35 @@ export class CategoriesService {
 
   async createCategory(createCategoryDto: CreateCategoryDto) {
     const { title } = createCategoryDto;
-    const category = await this.categoryModel.findOne({ title });
+    const category = await this.categoryModel.findOne({ title }).lean();
 
     if (category) {
       throw new BadRequestException('دسته بندی موجود می باشد');
     }
 
-    return this.categoryModel.create(createCategoryDto);
+    const createdCategory = await this.categoryModel.create(createCategoryDto);
+    return createdCategory.toJSON();
   }
 
   async updateCategory(updateCategoryDto: UpdateCategoryDto) {
     const { id, title } = updateCategoryDto;
-    const category = await this.categoryModel.findById(id);
+    const category = await this.categoryModel.findById(id).lean();
 
     if (!category) {
       throw new NotFoundException('دسته بندی با این مشخصات یافت نشد');
     }
 
-    const duplicateCategory = await this.categoryModel.findOne({ title });
+    const duplicateCategory = await this.categoryModel
+      .findOne({ title })
+      .lean();
 
     if (duplicateCategory) {
       throw new BadRequestException('دسته بندی موجود می باشد');
     }
 
-    return this.categoryModel.findByIdAndUpdate(id, updateCategoryDto);
+    return this.categoryModel
+      .findByIdAndUpdate(id, updateCategoryDto, { new: true })
+      .lean();
   }
 
   async deleteCategory(id: string) {
@@ -58,6 +63,6 @@ export class CategoriesService {
       throw new NotFoundException('دسته بندی با این مشخصات یافت نشد');
     }
 
-    return this.categoryModel.findOneAndDelete({ _id: id });
+    return this.categoryModel.findOneAndDelete({ _id: id }).lean();
   }
 }

@@ -35,14 +35,14 @@ export class AuthService {
       throw new HttpException('خطا در اطلاعات', 400);
     }
 
-    const payload = { username, role: user.role, id: user.id };
+    const payload = { username, role: user.role, id: user._id };
 
     const data = {
       access_token: this.jwtService.sign(payload, {
-        secret: '123',
+        secret: this.configService.get('JWT_SECRET'),
         expiresIn: '1d',
       }),
-      id: user.id,
+      id: user._id,
       role: user.role,
     };
 
@@ -66,14 +66,14 @@ export class AuthService {
     };
     const user = await this.userService.createUser(userData);
 
-    const payload = { username, role: user.role, id: user.id };
+    const payload = { username, role: user.role, id: user._id };
 
     const data = {
       access_token: this.jwtService.sign(payload, {
-        secret: '123',
+        secret: this.configService.get('JWT_SECRET'),
         expiresIn: '1d',
       }),
-      id: user.id,
+      id: user._id,
       role: user.role,
     };
     return data;

@@ -17,15 +17,22 @@ export class ProductsService {
 
   async getProducts(productQueryDto: ProductQueryDto) {
     const { category, query, sort } = productQueryDto;
+
+    const sortKey =
+      sort === 'price' ? 'price' : sort === 'date' ? 'updatedAt' : null;
+
     return this.productModel
       .find({ category: category, title: query })
       .populate('category')
-      .sort({ [sort]: 'desc' })
+      .sort({ [sortKey]: 'desc' })
       .lean();
   }
 
   async getProduct(id: string) {
-    const product = await this.productModel.findById(id).populate('category');
+    const product = await this.productModel
+      .findById(id)
+      .populate('category')
+      .lean();
 
     if (!product) {
       throw new NotFoundException('محصولی با این مشخصات یافت نشد');
@@ -45,10 +52,12 @@ export class ProductsService {
       throw new NotFoundException('دسته بندی موجود نمی باشد');
     }
 
-    return this.productModel.create({
+    const product = await this.productModel.create({
       ...createProductDto,
       image: productImage.path,
     });
+
+    return product.toJSON();
   }
 
   async updateProduct(
@@ -57,7 +66,7 @@ export class ProductsService {
   ) {
     const { id } = updateProductDto;
 
-    const product = await this.productModel.findById(id);
+    const product = await this.productModel.findById(id).lean();
 
     if (!product) {
       throw new NotFoundException('محصولی با این مشخصات یافت نشد');
@@ -80,11 +89,17 @@ export class ProductsService {
       });
     }
 
-    return this.productModel.findByIdAndUpdate(id, updateProductDto);
+    return this.productModel
+      .findByIdAndUpdate(
+        id,
+        { ...updateProductDto, image: product.image },
+        { new: true },
+      )
+      .lean();
   }
 
   async deleteProduct(id: string) {
-    const product = await this.productModel.findById(id);
+    const product = await this.productModel.findById(id).lean();
 
     if (!product) {
       throw new NotFoundException('محصولی با این مشخصات یافت نشد');
@@ -92,6 +107,6 @@ export class ProductsService {
 
     if (product.image) deleteFile('./' + product.image);
 
-    return this.productModel.findByIdAndDelete(id);
+    return this.productModel.findByIdAndDelete(id).lean();
   }
 }

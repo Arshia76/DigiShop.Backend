@@ -12,7 +12,7 @@ export class OrdersService {
     @Inject(REQUEST) private readonly request: Request,
   ) {}
   async getOrders() {
-    return this.orderModel.find();
+    return this.orderModel.find().lean();
   }
 
   async getCurrentUserOrders() {
@@ -26,9 +26,10 @@ export class OrdersService {
     const data = {
       ...createOrderDto,
       totalAmount: Number(createOrderDto.totalAmount),
-      date: createOrderDto.date,
-      user: createOrderDto.userId,
+      // @ts-ignore
+      user: this.request?.user.id,
     };
-    return this.orderModel.create(data);
+    const order = await this.orderModel.create(data);
+    return order.toJSON();
   }
 }

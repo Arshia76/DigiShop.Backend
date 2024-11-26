@@ -4,7 +4,7 @@ import { Category } from '../categories/category.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Product {
   @Prop()
   title: string;
@@ -20,9 +20,6 @@ export class Product {
 
   @Prop()
   image: string;
-
-  @Prop()
-  date: Date;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category' })
   category: Category;
