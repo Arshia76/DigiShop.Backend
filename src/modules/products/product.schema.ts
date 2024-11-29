@@ -6,22 +6,26 @@ export type ProductDocument = HydratedDocument<Product>;
 
 @Schema({ timestamps: true })
 export class Product {
-  @Prop()
+  @Prop({ type: String, required: true })
   title: string;
 
-  @Prop()
+  @Prop({ type: Number, required: true })
   price: number;
 
-  @Prop()
+  @Prop({ type: Number, required: true })
   quantity: number;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   description: string;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   image: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category' })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: true,
+  })
   category: Category;
 }
 

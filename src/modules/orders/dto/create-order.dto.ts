@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 class Address {
   @ApiProperty()
@@ -24,6 +31,24 @@ class Address {
   detail: string;
 }
 
+class OrderProduct {
+  @ApiProperty()
+  @IsNotEmpty({ message: 'شناسه محصول را وارد کنید' })
+  @IsString({ message: 'شناسه محصول را به صورت رشته وارد کنید' })
+  productId: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'تعداد انتخاب شده محصول را وارد کنید' })
+  @IsNumber(
+    {},
+    {
+      message: 'تعداد انتخاب شده محصول را به صورت عددی وارد کنید',
+    },
+  )
+  @IsPositive({ message: 'تعداد انتخاب شده محصول باید مقداری مثبت باشد' })
+  selectedQuantity: string;
+}
+
 export class CreateOrderDto {
   @ApiProperty({ type: () => Address })
   @ValidateNested({ each: true })
@@ -31,7 +56,8 @@ export class CreateOrderDto {
   address: Address;
 
   @ApiProperty()
-  @IsNotEmpty({ message: 'قیمت کل  را مشخص کنید' })
-  @IsString({ message: 'قیمت کل را به صورت رشته مشخص کنید' })
-  totalAmount: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderProduct)
+  products: OrderProduct[];
 }
