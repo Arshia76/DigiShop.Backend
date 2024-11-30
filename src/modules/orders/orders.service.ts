@@ -1,10 +1,16 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Order } from './order.schema';
 import { Model } from 'mongoose';
 import { REQUEST } from '@nestjs/core';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductsService } from '../products/products.service';
+import { Role } from '@/shared/enum';
 
 @Injectable()
 export class OrdersService {
@@ -18,7 +24,15 @@ export class OrdersService {
   }
 
   async getOrder(id: string) {
-    return this.orderModel.findById(id).lean();
+    const order = await this.orderModel.findById(id).lean();
+    // @ts-ignore
+    const user = this.request?.user;
+
+    if (user.role !== Role.ADMIN && order.user !== user.id) {
+      throw new ForbiddenException('شما مجوز دسترسی به این سفارش را ندارید');
+    }
+
+    return order;
   }
 
   async getCurrentUserOrders() {

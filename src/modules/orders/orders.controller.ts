@@ -4,7 +4,6 @@ import { OrdersService } from './orders.service';
 import { AccessJwtAuthGuard } from '../auth/guard/jwt-access-auth.guard';
 import { AdminGuard } from '../auth/guard/admin.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { CurrentUserGuard } from '../auth/guard/current-user.guard';
 
 @ApiBearerAuth()
 @Controller('orders')
@@ -23,7 +22,7 @@ export class OrdersController {
     return this.ordersService.getOrder(id);
   }
 
-  @Get('/currentUser')
+  @Get('/current/user')
   @UseGuards(AccessJwtAuthGuard)
   getCurrentUserOrders() {
     return this.ordersService.getCurrentUserOrders();
