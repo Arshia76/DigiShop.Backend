@@ -20,7 +20,7 @@ export class OrdersService {
     private readonly productsService: ProductsService,
   ) {}
   async getOrders() {
-    return this.orderModel.find().lean();
+    return this.orderModel.find().populate('user').lean();
   }
 
   async getOrder(id: string) {
@@ -28,7 +28,7 @@ export class OrdersService {
     // @ts-ignore
     const user = this.request?.user;
 
-    if (user.role !== Role.ADMIN && order.user !== user.id) {
+    if (user.role !== Role.ADMIN && order.user.toString() !== user.id) {
       throw new ForbiddenException('شما مجوز دسترسی به این سفارش را ندارید');
     }
 
